@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import Img from "gatsby-image"
 
 class BlogPost extends Component {
     render() {
         console.log(this.props)
-        const { title, content } = this.props.data.contentfulBlog
+        const { title, createdAt, featuredImage, content } = this.props.data.contentfulBlog
         return (
             <div>
                 <h1 style={{
@@ -13,6 +14,11 @@ class BlogPost extends Component {
                 }}>
                     {title}
                 </h1>
+                <p>{createdAt}</p>
+                <div>
+                    <Img sizes={featuredImage.sizes}/>
+                </div>
+                <hr />
                 <div dangerouslySetInnerHTML={{__html:content.childMarkdownRemark.html}} />
             </div>
         )
@@ -29,13 +35,10 @@ export const pageQuery = graphql`
     query blogPostQuery($slug: String!){
         contentfulBlog(slug: {eq: $slug}) {
             title
-            slug
-            createdAt
+            createdAt(formatString: "MMMM DD, YYYY")
             featuredImage {
-                file {
-                    url
-                    fileName
-                    contentType
+                sizes(maxWidth: 800) {
+                    ...GatsbyContentfulSizes
                 }
             }
             content {

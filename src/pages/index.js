@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'gatsby-link'
+import Img from "gatsby-image"
 
 const BlogPost = ({node}) => {
     return (
@@ -9,9 +10,10 @@ const BlogPost = ({node}) => {
             border: '1px solid #ccc'
         }}>
             <h3><Link to={node.slug}>{node.title}</Link></h3>
+            <p>{node.createdAt}</p>
             <div>
                 <div>
-                    <Link to={node.slug}><img src={node.featuredImage.responsiveResolution.src} /></Link>
+                    <Img resolutions={node.featuredImage.resolutions}/>
                 </div>
                 <div>{node.content.childMarkdownRemark.excerpt}</div>
             </div>
@@ -33,17 +35,23 @@ export default IndexPage
 
 export const pageQuery = graphql`
     query pageQuery {
-        allContentfulBlog(filter: {
-            node_locale: {eq: "en-US"}
-        }) {
+        allContentfulBlog(
+            filter: {
+                node_locale: {eq: "en-US"}
+            },
+            sort: {
+                fields: [createdAt], order: DESC
+            }
+        ) {
             edges {
                 node {
                     id
                     title
                     slug
+                    createdAt(formatString: "MMMM DD, YYYY")
                     featuredImage {
-                        responsiveResolution(width:300, height:300) {
-                            src
+                        resolutions(width: 300) {
+                            ...GatsbyContentfulResolutions
                         }
                     }
                     content {
